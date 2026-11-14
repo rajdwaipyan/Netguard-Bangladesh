@@ -56,10 +56,10 @@ The Windows workflow:
 - Installs development tooling.
 - Compiles the application and tests.
 - Runs the unittest suite.
-- Runs focused Ruff safety checks.
+- Runs the repository-configured Ruff safety checks.
 
-The workflow has been syntax-reviewed locally as text, but cannot be executed
-against GitHub from this non-Git workspace.
+The workflow was syntax-reviewed locally. Its GitHub Actions run status is
+reported below.
 
 ## Security improvements
 
@@ -78,7 +78,7 @@ review before public publication. It was not deleted or modified.
 
 - Unit tests: **80 passed, 0 failed**.
 - Python compilation: passed.
-- Ruff focused checks: passed via `python -m ruff check --select E9,F63,F7,F82 netguard_bangladesh.py tests`.
+- Ruff: passed via `python -m ruff check .`.
 - No live network, NVD, CISA, router, or firmware synchronization was run.
 
 ## License status
@@ -92,8 +92,35 @@ until the project owner selects and adds an appropriate license.
 - Target branch: `main`
 - Remote name: `origin`
 - Initial remote commit before synchronization: `a2d3e0270465fdb621fbf38e86df7865d19272e6`
-- Commit and push status: recorded below after verification.
+- Publication commit: `c0f3db342fa2c8d9253303b61079b4d2d97cabda`
+- Push status: **successful fast-forward**; `origin/main` resolves to the
+  publication commit.
 - GitHub release: not created.
+
+## Files uploaded and excluded
+
+Uploaded or replaced:
+
+- `netguard_bangladesh.py`
+- `tests/`
+- `docs/`
+- `README.md`, dependency manifests, `.gitignore`, community files, and
+  `.github/workflows/python-tests.yml`
+
+Removed from the current tree:
+
+- Obsolete extensionless `netguard_bangladesh` prototype; its history remains
+  available in earlier commits.
+
+Intentionally excluded:
+
+- Unrelated `index.html` containing personal contact information.
+- `netguard_data/`, caches, logs, `.env` files, virtual environments, and
+  other local runtime data.
+
+The GitHub Actions workflow was triggered by the push. Its status must be
+checked on GitHub and reported as queued, running, passed, failed, or not
+triggered; no status is inferred here.
 
 ## Remaining publication blockers
 
@@ -105,6 +132,5 @@ until the project owner selects and adds an appropriate license.
 
 ## Recommendation
 
-**Publication-ready files prepared; publication not completed.** The project
-should remain **Experimental / conditional** until the blockers above are
-resolved.
+**Publication completed successfully.** The project remains
+**Experimental / conditional** until the blockers above are resolved.
