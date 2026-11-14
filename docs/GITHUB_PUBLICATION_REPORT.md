@@ -118,9 +118,14 @@ Intentionally excluded:
 - `netguard_data/`, caches, logs, `.env` files, virtual environments, and
   other local runtime data.
 
-The GitHub Actions workflow was triggered by the push. Its status must be
-checked on GitHub and reported as queued, running, passed, failed, or not
-triggered; no status is inferred here.
+GitHub Actions verification:
+
+- Run for the primary publication commit
+  [`c0f3db3`](https://github.com/rajdwaipyan/Netguard-Bangladesh/actions/runs/43641846174):
+  **passed**.
+- Run for the publication-report update
+  [`01973c2`](https://github.com/rajdwaipyan/Netguard-Bangladesh/actions/runs/43641894787):
+  **in progress** when this report was updated.
 
 ## Remaining publication blockers
 
