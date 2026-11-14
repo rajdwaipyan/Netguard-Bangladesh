@@ -1,0 +1,5 @@
+# NetGuard Bangladesh core uses the Python standard library.
+# Optional chart and machine-learning integrations are detected at runtime:
+# numpy
+# matplotlib
+# scikit-learn

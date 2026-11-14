@@ -1,168 +1,227 @@
-# NetGuard Software Finalization Plan
+# NetGuard Bangladesh
 
-## Overview
-NetGuard is a comprehensive network security monitoring application designed specifically for Bangladesh users. The application monitors network traffic, detects potential security threats, and provides recommendations to improve network security.
+## Intelligent Network & Wi-Fi Security Monitoring Platform
 
-## Current Status
-Based on the shared code, I can see several key functionalities already implemented:
-- Export attack history to files
-- Network visualization map
-- Internet speed testing
-- User preferences management
-- Alert settings configuration
-- Security assessment and reporting
-- Vulnerability database updates
+**Discover. Monitor. Detect. Investigate. Protect.**
 
-## Finalization Tasks
+NetGuard Bangladesh is an evidence-driven Windows network security monitoring
+application for individuals, IT administrators, NGOs, educational institutions,
+and businesses. It combines local network observations, router assessment,
+wireless intelligence, and public vulnerability information while keeping
+uncertainty visible.
 
-### 1. Code Review and Bug Fixing
+> **Current status: Experimental / conditional phase releases.**  
+> NetGuard is not an antivirus replacement, enterprise EDR, commercial firewall,
+> or guarantee of attack prevention.
 
-#### Core Functionality Review
-- Ensure all methods referenced in the code are properly implemented
-- Review error handling throughout the application
-- Validate all UI elements are properly rendered
-- Test threading implementation for potential race conditions
+## Project overview
 
-#### Class Dependencies
-- Verify all referenced classes exist:
-  - `NetworkAnalyzer`
-  - `NetworkScanner`
-  - `Language` for internationalization
+NetGuard helps administrators understand what a Windows host can actually
+observe on an authorized local network. It distinguishes ARP-cache evidence from
+active ICMP reachability, records historical changes, assesses the selected
+gateway with bounded read-only checks, and provides conservative UPnP, DNS,
+Wi-Fi, and router firmware intelligence.
 
-#### Constants and Global Variables
-- Define `APP_NAME`, `VERSION`, and other constants referenced in the code
-- Ensure all referenced globals are defined (`ALERT_SOUNDS_ENABLED`, `MATPLOTLIB_AVAILABLE`, `NUMPY_AVAILABLE`, etc.)
+The project prioritizes defensible evidence over simulated telemetry. Unknown
+devices are not treated as malicious, mapping changes are not confirmed as ARP
+spoofing, and a missing vulnerability record is not treated as proof of safety.
 
-### 2. Completing Missing Functionality
+## Key features
 
-#### Network Analysis Core
-- Implement the actual network packet analysis (currently simulated)
-- Create real network scanning capabilities
-- Develop actual attack detection algorithms
+### Network discovery
 
-#### Data Structures
-- Define the `ATTACK_SIGNATURES` dictionary with real attack profiles
-- Create proper data structures for storing network information
+- Windows interface and IPv4 subnet discovery.
+- Explicitly authorized private/link-local IPv4 discovery.
+- Windows ARP-cache observation and historical device inventory.
+- Cancellable, bounded ICMP probing.
+- Conservative duplicate and mapping-change anomalies.
 
-#### Authentication
-- Add router authentication handling for different router models
-- Create secure credential storage
+ARP-cache presence does not prove that a device is online, safe, connected now,
+or that the complete network has been discovered.
 
-### 3. Bangladesh-Specific Features
+### Router security
 
-#### ISP Integration
-- Complete integration with common Bangladesh ISPs
-- Add Bangladesh-specific security recommendations
-- Implement specific detection for common threats in Bangladesh's network environment
+- Selected-interface gateway identification.
+- Read-only local gateway TCP service assessment.
+- Minimal HTTP observations without credentials or redirect following.
+- TLS certificate and handshake observations.
+- No exploitation, brute forcing, credential attempts, or configuration changes.
 
-#### Localization
-- Complete Bengali translations
-- Add Bangladesh-specific network diagnostics
+### UPnP and DNS
 
-### 4. UI Improvements
+- Authorized IPv4 SSDP discovery.
+- Local device-description parsing with size and XML safety limits.
+- Windows DNS configuration observation.
+- Consent-based UDP A/AAAA resolver checks and comparisons.
 
-#### Visual Consistency
-- Ensure consistent styling throughout the application
-- Add professional icons and imagery
-- Improve dark mode implementation
+IPv6 SSDP, DNSSEC, DoH, DoT, and DoQ are not implemented.
 
-#### Usability Enhancements
-- Add tooltips and help information
-- Create a more intuitive first-run experience
-- Add a comprehensive dashboard view
+### Wi-Fi intelligence
 
-### 5. Documentation
+- Windows `netsh wlan` adapter and driver observations.
+- Current connection and nearby SSID/BSSID observations.
+- Authentication, cipher, signal, and channel classification.
+- Local wireless baseline management.
+- Informational indicators for new BSSIDs, open networks, and weaker security.
 
-#### User Documentation
-- Create comprehensive user manual in both English and Bengali
-- Add contextual help throughout the application
-- Create troubleshooting guides
+These indicators do not confirm a rogue access point, evil twin, interception,
+or compromise. Client-mode output is not monitor-mode packet capture.
 
-#### Developer Documentation
-- Document code structure and architecture
-- Add docstrings to all classes and methods
-- Create contribution guidelines
+### Firmware intelligence
 
-### 6. Deployment
+- Explicit router product and firmware registration.
+- User-provided versus user-confirmed identity states.
+- NVD CVE 2.0 retrieval with caching, pagination, retries, and rate limiting.
+- CPE configuration-tree and version-range evaluation.
+- CISA KEV prioritization after product applicability.
+- Validated official manufacturer advisory records.
+- Read-only firmware update recommendations.
 
-#### Packaging and Installation
-- Create installer for Windows, macOS, and Linux
-- Set up automatic updates
-- Create proper file structure for data storage
+Firmware intelligence is conditional on exact product evidence and source
+freshness. It does not download, upload, or install firmware.
 
-#### Prerequisites Handling
-- Add automatic installation of dependencies (matplotlib, numpy, etc.)
-- Handle cases where optional dependencies aren't available
+## Architecture
 
-### 7. Testing
+The current application remains a single Tkinter entry point with tested
+service-style engines inside the module:
 
-#### Security Testing
-- Penetration testing of the application itself
-- Validate security recommendations
-- Test all detection algorithms against real-world attacks
+```mermaid
+flowchart TD
+    UI[Tkinter dashboard] --> Q[Queue and root.after poller]
+    Q --> D[DiscoveryEngine]
+    Q --> R[RouterIdentificationEngine]
+    Q --> A[RouterManagementAssessmentEngine]
+    Q --> U[UPnPDiscoveryEngine]
+    Q --> DNS[DNSConfigurationEngine]
+    Q --> W[WirelessSecurityEngine]
+    Q --> F[VulnerabilitySourceClient]
+    D --> H[NetworkAnalyzer]
+    R --> H
+    A --> H
+    U --> H
+    DNS --> H
+    W --> H
+    F --> FI[FirmwareIntelligenceEngine]
+    FI --> H
+    H --> J[Atomic JSON persistence]
+```
 
-#### Performance Testing
-- Optimize for low-resource environments
-- Test on various hardware configurations
-- Benchmark network scanning speed
+Workers collect evidence and publish immutable results through `queue.Queue`.
+Only the Tkinter main thread updates widgets. See
+[ARCHITECTURE.md](docs/ARCHITECTURE.md) for phase boundaries.
 
-#### Usability Testing
-- Conduct user testing with Bangladesh network users
-- Gather feedback on UI and workflow
-- Validate translations with native Bengali speakers
+## Technology stack
 
-### 8. Quality Assurance Checklist
+- Python 3.10+ language features; local verification was performed with
+  Python 3.14.5.
+- Tkinter for the Windows desktop UI.
+- Python standard library for Windows commands, sockets, HTTPS, JSON, XML, and
+  concurrency.
+- Optional NumPy, Matplotlib, and scikit-learn integrations are detected at
+  runtime and are not required for the deterministic test suite.
+- Ruff is used as an optional development static-analysis tool.
 
-- [ ] All functions properly implemented and tested
-- [ ] No references to undefined variables or methods
-- [ ] Error handling for all network and file operations
-- [ ] Proper threading with no race conditions
-- [ ] All strings properly localized
-- [ ] Dark mode fully functional
-- [ ] Settings properly saved and restored
-- [ ] Reporting functions generate valid outputs
-- [ ] Security recommendations accurate and helpful
-- [ ] Performance acceptable on target hardware
+## Installation
 
-## Implementation Schedule
+Windows is the supported runtime platform.
 
-### Phase 1: Core Functionality (2 weeks)
-- Complete all core network analysis functions
-- Fix any bugs in existing code
-- Implement proper data structures
+```powershell
+git clone <repository-url>
+cd netguard_Bangladesh
+py -3.14 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements-dev.txt
+```
 
-### Phase 2: UI and Experience (1 week)
-- Finalize all UI elements
-- Complete localization
-- Add help and documentation
+The core application has no mandatory third-party runtime dependency. Optional
+chart or machine-learning packages may be installed separately if desired:
 
-### Phase 3: Testing and Optimization (1 week)
-- Security testing
-- Performance optimization
-- User testing and feedback
+```powershell
+python -m pip install numpy matplotlib scikit-learn
+```
 
-### Phase 4: Packaging and Deployment (1 week)
-- Create installation packages
-- Set up update mechanisms
-- Finalize documentation
+Start the application:
 
-## Additional Recommendations
+```powershell
+python netguard_bangladesh.py
+```
 
-### Modern UI Framework
-Consider migrating from tkinter to a more modern UI framework like Qt for better visual appearance and more UI capabilities.
+Npcap is not required for the implemented metadata, ICMP, ARP, SSDP, DNS, or
+`netsh wlan` paths. Packet capture and monitor-mode Wi-Fi capabilities are not
+implemented.
 
-### Cloud Integration
-Add optional cloud backup of security reports and settings.
+## Usage
 
-### Machine Learning
-Implement basic machine learning for better threat detection based on historical data.
+1. Launch NetGuard.
+2. Select the intended Windows network interface.
+3. Review the displayed subnet and authorize active discovery only when allowed.
+4. Identify the gateway from local interface and ARP evidence.
+5. Authorize a read-only gateway service assessment if appropriate.
+6. Authorize UPnP discovery or DNS resolver checks separately.
+7. Inspect Wi-Fi observations and create a baseline only after review.
+8. Register an exact router model and firmware before synchronizing NVD/KEV data.
+9. Review historical device, wireless, router, and firmware assessments.
+10. Interpret every finding with its evidence, confidence, and limitations.
 
-### Mobile Companion App
-Develop a mobile companion app for notifications and basic monitoring.
+## Security and privacy
 
-### ISP Partnerships
-Explore partnerships with Bangladesh ISPs for better integration and access to network data.
+- Assess only networks and devices you are authorized to inspect.
+- Active actions require explicit user consent.
+- No password brute forcing, exploitation, or automatic blocking.
+- No automatic router configuration or firmware modification.
+- Public intelligence synchronization sends only a product search term.
+- Router credentials, private addresses, MAC addresses, and configurations are
+  not sent to NVD or CISA.
+- API keys are read from environment configuration and are not persisted.
+- Findings preserve source evidence and remain conservative when data is
+  incomplete or stale.
 
-## Conclusion
+Read [SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) before deployment.
 
-NetGuard has a solid foundation with many important features already implemented. With the completion of the tasks outlined above, it will become a comprehensive and valuable security tool for network users in Bangladesh. The focus on localization and Bangladesh-specific network threats will make it particularly valuable in that market.
+## Current limitations
+
+- Windows is the supported runtime platform.
+- ARP and ICMP do not guarantee complete device discovery.
+- IPv6 neighbor discovery and DHCP evidence are not implemented.
+- IPv6 SSDP, DNSSEC, DoH, DoT, and DoQ are not implemented.
+- Wi-Fi output is client-mode metadata, not packet capture.
+- Rogue AP and evil-twin indicators are not confirmations.
+- Firmware coverage depends on exact model, hardware, region, and version
+  evidence; no-match is not proof of safety.
+- No live router or vulnerability validation was performed in this workspace.
+- The application remains a monolithic Tkinter module with JSON persistence.
+
+## Roadmap
+
+See [ROADMAP.md](docs/ROADMAP.md) and
+[FEATURE_STATUS.md](docs/FEATURE_STATUS.md). Phase reports record conditional
+acceptance boundaries rather than claiming universal support.
+
+## Testing
+
+```powershell
+python -m unittest discover -s tests -v
+python -m py_compile netguard_bangladesh.py tests\test_discovery_engine.py tests\test_runtime_probes.py
+```
+
+The latest local run executed **80 tests with 80 passing**. Tests use controlled
+fixtures and mocks; they do not require internet access or a real network.
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change. New network
+behavior requires deterministic tests, explicit authorization boundaries,
+documentation updates, and evidence-preserving error handling.
+
+## License
+
+No `LICENSE` file is currently present. A license decision by the project owner
+is required before describing this repository as open source.
+
+## Disclaimer
+
+NetGuard is defensive assessment and monitoring software. It cannot guarantee
+complete visibility, vulnerability detection, or protection from cyberattacks.
+Use it only within your authority and verify important findings through
+official device, network, and manufacturer records.
